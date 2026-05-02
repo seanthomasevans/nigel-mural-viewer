@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dear Rockaway Beach, Thank You Rockaway Beach — Mural Proposal · Nigel Scott</title>
+<meta name="description" content="3D preview of the proposed mural by Nigel Scott on the lifeguard storage container at 97th Street and Shore Front Parkway, Rockaway Beach, NY." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+<style>
+  :root {
+    --ink:        #0e1c2c;
+    --ink-soft:   #2a3a4f;
+    --paper:      #f3ece0;
+    --paper-warm: #ece1cf;
+    --sea:        #1f4d76;
+    --sea-deep:   #112e4a;
+    --line:       rgba(14, 28, 44, 0.18);
+    --shadow-lg:  0 24px 60px -20px rgba(14, 28, 44, 0.35);
+    --radius:     14px;
+    --radius-sm:  10px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% 0%,  #d9e2ec 0%, transparent 60%),
+      radial-gradient(100% 60% at 50% 100%, #e8dfcf 0%, transparent 55%),
+      var(--paper);
+    overflow: hidden;
+  }
+
+  /* Stage */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /* Header */
+  header {
+    padding: 22px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  header > * { pointer-events: auto; }
+
+  .titleblock h1 {
+    font-family: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.1;
+    margin: 0 0 4px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .titleblock .meta {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    opacity: 0.85;
+  }
+  .titleblock .meta a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Camera preset chips */
+  .views {
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px;
+    box-shadow: var(--shadow-lg);
+  }
+  .views button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font: 500 13px/1 "Inter", sans-serif;
+    color: var(--ink-soft);
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .views button:hover { color: var(--ink); }
+  .views button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .views button:focus-visible {
+    outline: 2px solid var(--sea);
+    outline-offset: 2px;
+  }
+
+  /* Model stage */
+  .canvas-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  model-viewer {
+    width: 100%;
+    height: 100%;
+    --poster-color: transparent;
+    background: transparent;
+  }
+
+  /* Variant toggle (bottom centre) */
+  footer {
+    padding: 0 28px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  footer > * { pointer-events: auto; }
+
+  .variant-toggle {
+    display: inline-flex;
+    background: rgba(14, 28, 44, 0.92);
+    color: var(--paper);
+    border-radius: 999px;
+    padding: 4px;
+    box-shadow: var(--shadow-lg);
+  }
+  .variant-toggle button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: rgba(243, 236, 224, 0.65);
+    font: 600 13px/1 "Inter", sans-serif;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .variant-toggle button[aria-pressed="true"] {
+    background: var(--paper);
+    color: var(--sea-deep);
+  }
+  .variant-toggle button:hover { color: var(--paper); }
+  .variant-toggle button[aria-pressed="true"]:hover { color: var(--sea-deep); }
+  .variant-toggle button:focus-visible {
+    outline: 2px solid var(--paper);
+    outline-offset: 2px;
+  }
+
+  /* Caption beneath toggle */
+  .caption {
+    position: absolute;
+    bottom: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* Loading state */
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--ink-soft);
+    font: 500 12px/1 "Inter", sans-serif;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 240ms ease;
+  }
+  .loading[hidden] { opacity: 0; }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    header { padding: 14px 16px 0; flex-direction: column; gap: 12px; }
+    .views { align-self: flex-end; }
+    .views button { padding: 7px 11px; font-size: 12px; }
+    footer { padding: 0 12px 16px; }
+    .variant-toggle button { padding: 9px 14px; font-size: 12px; }
+    .caption { bottom: 76px; font-size: 13px; padding: 0 16px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <header>
+      <div class="titleblock">
+        <h1>Dear Rockaway Beach,<br />Thank You Rockaway Beach</h1>
+        <div class="meta">
+          Nigel Scott · 20&prime; container, 97th &amp; Shore Front Parkway · <a href="https://n4nigelscott.com" target="_blank" rel="noopener">n4nigelscott.com</a>
+        </div>
+      </div>
+
+      <nav class="views" aria-label="Camera presets">
+        <button data-view="hero" aria-pressed="true">Hero</button>
+        <button data-view="front">Front</button>
+        <button data-view="end">End</button>
+        <button data-view="aerial">Aerial</button>
+      </nav>
+    </header>
+
+    <div class="canvas-wrap">
+      <model-viewer
+        id="viewer"
+        src="models/container-v1.glb"
+        alt="20-foot shipping container with Nigel Scott mural rendered in 3D"
+        camera-controls
+        touch-action="pan-y"
+        interaction-prompt="auto"
+        shadow-intensity="1"
+        shadow-softness="0.85"
+        exposure="1.05"
+        environment-image="neutral"
+        camera-orbit="-30deg 78deg 10m"
+        camera-target="0m 1.3m 0m"
+        field-of-view="30deg"
+        min-camera-orbit="auto auto 4m"
+        max-camera-orbit="auto auto 22m"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+      ></model-viewer>
+      <div class="caption" id="caption">Drag to rotate &middot; pinch or scroll to zoom</div>
+    </div>
+
+    <footer>
+      <div class="variant-toggle" role="group" aria-label="Mural variant">
+        <button data-variant="v1" aria-pressed="true">Variant 1 — Horizon</button>
+        <button data-variant="v2" aria-pressed="false">Variant 2 — Surface</button>
+      </div>
+    </footer>
+
+  </div>
+
+<script>
+  const viewer = document.getElementById("viewer");
+
+  // --- Variants ---
+  const VARIANTS = {
+    v1: "models/container-v1.glb",
+    v2: "models/container-v2.glb",
+  };
+  document.querySelectorAll(".variant-toggle button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const v = btn.dataset.variant;
+      document.querySelectorAll(".variant-toggle button").forEach(b => {
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      viewer.src = VARIANTS[v];
+    });
+  });
+
+  // --- Camera presets (orbit: theta phi radius) ---
+  const VIEWS = {
+    hero:   { orbit: "-32deg 78deg 12m",  fov: "30deg",  target: "0m 1.3m 0m" },
+    front:  { orbit: "0deg 88deg 12m",    fov: "26deg",  target: "0m 1.3m 0m" },
+    end:    { orbit: "-90deg 82deg 9m",   fov: "28deg",  target: "0m 1.3m 0m" },
+    aerial: { orbit: "-30deg 38deg 16m",  fov: "30deg",  target: "0m 0.6m 0m" },
+  };
+  document.querySelectorAll(".views button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const v = btn.dataset.view;
+      document.querySelectorAll(".views button").forEach(b => {
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      const view = VIEWS[v];
+      viewer.cameraOrbit = view.orbit;
+      viewer.fieldOfView = view.fov;
+      viewer.cameraTarget = view.target;
+    });
+  });
+
+</script>
+</body>
+</html>
