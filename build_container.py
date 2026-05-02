@@ -19,7 +19,7 @@ if len(argv) < 2:
 
 FRONT_TEX = os.path.abspath(argv[0])
 OUTPUT = os.path.abspath(argv[1])
-END_TEX = os.path.abspath(os.path.join(os.path.dirname(__file__), "textures", "mural-3-square.jpg"))
+END_TEX = os.path.abspath(os.path.join(os.path.dirname(__file__), "textures", "panels", "end.jpg"))
 
 # ISO 20ft external dims (metres)
 L = 6.058   # length (X)
