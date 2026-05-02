@@ -306,11 +306,9 @@
         shadow-softness="0.85"
         exposure="1.05"
         environment-image="neutral"
-        camera-orbit="-30deg 78deg 10m"
         camera-target="0m 1.3m 0m"
-        field-of-view="30deg"
         min-camera-orbit="auto auto 4m"
-        max-camera-orbit="auto auto 22m"
+        max-camera-orbit="auto auto 60m"
         ar
         ar-modes="webxr scene-viewer quick-look"
       ></model-viewer>
@@ -368,25 +366,72 @@
     syncModel();
   });
 
-  // --- Camera presets (orbit: theta phi radius) ---
+  // --- Camera presets ---
+  // Each preset specifies the orbital angles plus a base FOV. Radius is
+  // computed per-viewport so the container always lands fully framed,
+  // regardless of phone / desktop / portrait / landscape.
+  const CONTAINER = { L: 6.058, W: 2.438, H: 2.591 };
   const VIEWS = {
-    hero:   { orbit: "-32deg 78deg 12m",  fov: "30deg",  target: "0m 1.3m 0m" },
-    front:  { orbit: "0deg 88deg 12m",    fov: "26deg",  target: "0m 1.3m 0m" },
-    end:    { orbit: "-90deg 82deg 9m",   fov: "28deg",  target: "0m 1.3m 0m" },
-    aerial: { orbit: "-30deg 38deg 16m",  fov: "30deg",  target: "0m 0.6m 0m" },
+    hero:   { theta: -32, phi: 78, fov: 30, target: "0m 1.3m 0m" },
+    front:  { theta:   0, phi: 88, fov: 26, target: "0m 1.3m 0m" },
+    end:    { theta:  90, phi: 82, fov: 28, target: "0m 1.3m 0m" },
+    aerial: { theta: -30, phi: 38, fov: 30, target: "0m 0.6m 0m" },
   };
+
+  // Mobile gets a touch more padding so the variant pill / chrome doesn't
+  // clip the box.
+  function paddingForViewport() {
+    return window.innerWidth < 720 ? 1.35 : 1.18;
+  }
+
+  function fitRadius(theta, phi, fov) {
+    const θ = theta * Math.PI / 180;
+    const φ = phi * Math.PI / 180;
+    // Worst-case projected width onto camera plane at this azimuth:
+    const projW = Math.abs(CONTAINER.L * Math.sin(θ)) + Math.abs(CONTAINER.W * Math.cos(θ));
+    // Vertical extent grows with downward tilt (phi away from 90°):
+    const lean   = Math.abs(Math.cos(φ));
+    const projH  = CONTAINER.H * Math.abs(Math.sin(φ)) +
+                   Math.max(CONTAINER.L, CONTAINER.W) * lean;
+    const aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+    const tanV   = Math.tan(fov * Math.PI / 360);
+    const tanH   = aspect * tanV;
+    const dV = (projH / 2) / tanV;
+    const dH = (projW / 2) / tanH;
+    return Math.max(dV, dH) * paddingForViewport();
+  }
+
+  let currentView = "hero";
+
+  function applyView(name) {
+    currentView = name;
+    const v = VIEWS[name];
+    const r = fitRadius(v.theta, v.phi, v.fov).toFixed(2);
+    viewer.cameraOrbit = `${v.theta}deg ${v.phi}deg ${r}m`;
+    viewer.fieldOfView = `${v.fov}deg`;
+    viewer.cameraTarget = v.target;
+  }
+
   document.querySelectorAll(".views button").forEach(btn => {
     btn.addEventListener("click", () => {
-      const v = btn.dataset.view;
       document.querySelectorAll(".views button").forEach(b => {
         b.setAttribute("aria-pressed", String(b === btn));
       });
-      const view = VIEWS[v];
-      viewer.cameraOrbit = view.orbit;
-      viewer.fieldOfView = view.fov;
-      viewer.cameraTarget = view.target;
+      applyView(btn.dataset.view);
     });
   });
+
+  // Re-fit on viewport changes (rotation, resize).
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => applyView(currentView), 120);
+  });
+
+  // Apply hero framing once the model is loaded so the container lands
+  // fully in-frame on first paint.
+  viewer.addEventListener("load", () => applyView(currentView), { once: true });
+  applyView(currentView);
 
 </script>
 </body>
