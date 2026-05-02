@@ -15,7 +15,8 @@ cd "$(dirname "$0")"
 METAL="#6b7880"
 mkdir -p textures/panels
 
-# Front panels (mural placed at native height, padded horizontally)
+# V1, V2 — fit (mural at native aspect, padded with metal on the sides)
+
 # mural-1: 2400×1596 → canvas 3731×1596
 magick -size 3731x1596 "xc:$METAL" \
   textures/mural-1-landscape.jpg -gravity center -composite \
@@ -25,6 +26,19 @@ magick -size 3731x1596 "xc:$METAL" \
 magick -size 3355x1435 "xc:$METAL" \
   textures/mural-2-landscape.jpg -gravity center -composite \
   -quality 92 textures/panels/front-v2.jpg
+
+# V3, V4 — fill (mural cropped top-aligned to panel aspect 2.338, edge to edge)
+# Crop window 2400 × 1027 keeps the handwritten text at the top of the
+# composition; bottom of the canvas is sacrificed instead so the mural
+# fills the panel without distortion.
+
+magick textures/mural-1-landscape.jpg \
+  -crop 2400x1027+0+0 +repage \
+  -quality 92 textures/panels/front-v3.jpg
+
+magick textures/mural-2-landscape.jpg \
+  -crop 2400x1027+0+0 +repage \
+  -quality 92 textures/panels/front-v4.jpg
 
 # End panel (mural placed at native width, padded vertically)
 # mural-3: 2400×2397 → canvas 2400×2551

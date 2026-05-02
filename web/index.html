@@ -137,24 +137,46 @@
 
   .variant-toggle {
     display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
     background: rgba(14, 28, 44, 0.92);
     color: var(--paper);
     border-radius: 999px;
     padding: 4px;
     box-shadow: var(--shadow-lg);
+    max-width: min(720px, calc(100vw - 32px));
   }
   .variant-toggle button {
     appearance: none;
     background: transparent;
     border: 0;
     color: rgba(243, 236, 224, 0.65);
-    font: 600 13px/1 "Inter", sans-serif;
-    padding: 10px 18px;
+    font: 600 12px/1 "Inter", sans-serif;
+    padding: 9px 13px;
     border-radius: 999px;
     cursor: pointer;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    white-space: nowrap;
     transition: background-color 160ms ease, color 160ms ease;
+  }
+  .variant-toggle button .num {
+    opacity: 0.55;
+    margin-right: 4px;
+    font-weight: 700;
+  }
+  .variant-toggle button .tag {
+    margin-left: 6px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    background: rgba(243, 236, 224, 0.12);
+    color: rgba(243, 236, 224, 0.7);
+  }
+  .variant-toggle button[aria-pressed="true"] .tag {
+    background: rgba(17, 46, 74, 0.18);
+    color: var(--sea-deep);
   }
   .variant-toggle button[aria-pressed="true"] {
     background: var(--paper);
@@ -257,8 +279,10 @@
 
     <footer>
       <div class="variant-toggle" role="group" aria-label="Mural variant">
-        <button data-variant="v1" aria-pressed="true">Variant 1 — Horizon</button>
-        <button data-variant="v2" aria-pressed="false">Variant 2 — Surface</button>
+        <button data-variant="v1" aria-pressed="true"><span class="num">1</span>Horizon<span class="tag">fit</span></button>
+        <button data-variant="v2" aria-pressed="false"><span class="num">2</span>Surface<span class="tag">fit</span></button>
+        <button data-variant="v3" aria-pressed="false"><span class="num">3</span>Horizon<span class="tag">fill</span></button>
+        <button data-variant="v4" aria-pressed="false"><span class="num">4</span>Surface<span class="tag">fill</span></button>
       </div>
     </footer>
 
@@ -271,6 +295,8 @@
   const VARIANTS = {
     v1: "models/container-v1.glb",
     v2: "models/container-v2.glb",
+    v3: "models/container-v3.glb",
+    v4: "models/container-v4.glb",
   };
   document.querySelectorAll(".variant-toggle button").forEach(btn => {
     btn.addEventListener("click", () => {
