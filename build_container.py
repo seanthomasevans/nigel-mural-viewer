@@ -13,8 +13,10 @@ from mathutils import Vector
 
 argv = sys.argv
 argv = argv[argv.index("--") + 1:] if "--" in argv else []
+PLAIN_ENDS = "--plain-ends" in argv
+argv = [a for a in argv if a != "--plain-ends"]
 if len(argv) < 2:
-    print("usage: ... -- <front_texture.jpg> <output.glb>")
+    print("usage: ... -- <front_texture.jpg> <output.glb> [--plain-ends]")
     sys.exit(1)
 
 FRONT_TEX = os.path.abspath(argv[0])
@@ -117,7 +119,7 @@ def make_solid_material(name, rgb, roughness=0.6):
 mat_metal = make_solid_material("ContainerMetal", (0.42, 0.47, 0.50))
 mat_floor = make_solid_material("ContainerUnder", (0.18, 0.18, 0.18), roughness=0.9)
 mat_front = make_image_material("Mural_Front", FRONT_TEX)
-mat_end = make_image_material("Mural_End", END_TEX)
+mat_end = mat_metal if PLAIN_ENDS else make_image_material("Mural_End", END_TEX)
 
 front.data.materials.append(mat_front)
 back.data.materials.append(mat_metal)
@@ -152,4 +154,4 @@ bpy.ops.export_scene.gltf(
 
 print(f"\n[OK] wrote {OUTPUT}")
 print(f"     front mural: {FRONT_TEX}")
-print(f"     end mural:   {END_TEX}")
+print(f"     end mural:   {'(plain metal)' if PLAIN_ENDS else END_TEX}")

@@ -189,6 +189,46 @@
     outline-offset: 2px;
   }
 
+  /* End-cap toggle (sits beside the variant pill) */
+  .ends-toggle {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px 8px 12px;
+    font: 600 11px/1 "Inter", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow-lg);
+    transition: color 160ms ease, background-color 160ms ease;
+  }
+  .ends-toggle:hover { color: var(--ink); }
+  .ends-toggle .dot {
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: var(--ink-soft);
+    opacity: 0.35;
+    transition: background-color 160ms ease, opacity 160ms ease;
+  }
+  .ends-toggle[aria-pressed="true"] .dot {
+    background: var(--sea);
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(31, 77, 118, 0.18);
+  }
+  .ends-toggle .state { font-weight: 700; min-width: 22px; text-align: center; }
+  .ends-toggle:focus-visible {
+    outline: 2px solid var(--sea);
+    outline-offset: 2px;
+  }
+
   /* Caption beneath toggle */
   .caption {
     position: absolute;
@@ -284,28 +324,48 @@
         <button data-variant="v3" aria-pressed="false"><span class="num">3</span>Horizon<span class="tag">fill</span></button>
         <button data-variant="v4" aria-pressed="false"><span class="num">4</span>Surface<span class="tag">fill</span></button>
       </div>
+      <button class="ends-toggle" id="endsToggle" aria-pressed="true" type="button">
+        <span class="dot" aria-hidden="true"></span>
+        End&nbsp;caps
+        <span class="state">on</span>
+      </button>
     </footer>
 
   </div>
 
 <script>
   const viewer = document.getElementById("viewer");
+  const endsToggle = document.getElementById("endsToggle");
+
+  // --- State ---
+  let currentVariant = "v1";
+  let endsOn = true;
+
+  function modelPath() {
+    return `models/container-${currentVariant}${endsOn ? "" : "-plain"}.glb`;
+  }
+  function syncModel() {
+    const next = modelPath();
+    if (viewer.src !== next) viewer.src = next;
+  }
 
   // --- Variants ---
-  const VARIANTS = {
-    v1: "models/container-v1.glb",
-    v2: "models/container-v2.glb",
-    v3: "models/container-v3.glb",
-    v4: "models/container-v4.glb",
-  };
   document.querySelectorAll(".variant-toggle button").forEach(btn => {
     btn.addEventListener("click", () => {
-      const v = btn.dataset.variant;
+      currentVariant = btn.dataset.variant;
       document.querySelectorAll(".variant-toggle button").forEach(b => {
         b.setAttribute("aria-pressed", String(b === btn));
       });
-      viewer.src = VARIANTS[v];
+      syncModel();
     });
+  });
+
+  // --- End-cap toggle ---
+  endsToggle.addEventListener("click", () => {
+    endsOn = !endsOn;
+    endsToggle.setAttribute("aria-pressed", String(endsOn));
+    endsToggle.querySelector(".state").textContent = endsOn ? "on" : "off";
+    syncModel();
   });
 
   // --- Camera presets (orbit: theta phi radius) ---

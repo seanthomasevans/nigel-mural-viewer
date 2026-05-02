@@ -36,8 +36,11 @@ magick textures/mural-1-landscape.jpg \
   -crop 2400x1027+0+0 +repage \
   -quality 92 textures/panels/front-v3.jpg
 
+# V4 crop is shifted down 60px so "Waves are" sits just below the top
+# of the panel with a slim band of sky for headroom; the horizon line
+# lands at roughly 43% from the top.
 magick textures/mural-2-landscape.jpg \
-  -crop 2400x1027+0+0 +repage \
+  -crop 2400x1027+0+60 +repage \
   -quality 92 textures/panels/front-v4.jpg
 
 # End panel (mural placed at native width, padded vertically)
