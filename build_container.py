@@ -119,12 +119,15 @@ def make_solid_material(name, rgb, roughness=0.6):
 mat_metal = make_solid_material("ContainerMetal", (0.42, 0.47, 0.50))
 mat_floor = make_solid_material("ContainerUnder", (0.18, 0.18, 0.18), roughness=0.9)
 mat_front = make_image_material("Mural_Front", FRONT_TEX)
-mat_end = mat_metal if PLAIN_ENDS else make_image_material("Mural_End", END_TEX)
+# The container's left end is the entry-doors side; it stays plain metal
+# in every variant. Only the right end carries the square mural, and that
+# can be hidden via the --plain-ends flag.
+mat_end_right = mat_metal if PLAIN_ENDS else make_image_material("Mural_End", END_TEX)
 
 front.data.materials.append(mat_front)
 back.data.materials.append(mat_metal)
-end_left.data.materials.append(mat_end)
-end_right.data.materials.append(mat_end)
+end_left.data.materials.append(mat_metal)
+end_right.data.materials.append(mat_end_right)
 roof.data.materials.append(mat_metal)
 floor.data.materials.append(mat_floor)
 
