@@ -289,7 +289,6 @@
       <nav class="views" aria-label="Camera presets">
         <button data-view="hero" aria-pressed="true">Hero</button>
         <button data-view="front">Front</button>
-        <button data-view="end">End</button>
         <button data-view="aerial">Aerial</button>
       </nav>
     </header>
@@ -316,38 +315,25 @@
     </div>
 
     <footer>
-      <div class="variant-toggle" role="group" aria-label="Mural variant">
-        <button data-variant="v1" aria-pressed="true"><span class="num">1</span>Horizon<span class="tag">fit</span></button>
-        <button data-variant="v2" aria-pressed="false"><span class="num">2</span>Surface<span class="tag">fit</span></button>
-        <button data-variant="v3" aria-pressed="false"><span class="num">3</span>Horizon<span class="tag">fill</span></button>
-        <button data-variant="v4" aria-pressed="false"><span class="num">4</span>Surface<span class="tag">fill</span></button>
+      <div class="variant-toggle" role="group" aria-label="Mural layout">
+        <button data-variant="v1" aria-pressed="true"><span class="num">1</span>Layout One</button>
+        <button data-variant="v2" aria-pressed="false"><span class="num">2</span>Layout Two</button>
+        <button data-variant="v3" aria-pressed="false"><span class="num">3</span>Layout Three</button>
       </div>
-      <button class="ends-toggle" id="endsToggle" aria-pressed="true" type="button">
-        <span class="dot" aria-hidden="true"></span>
-        End&nbsp;caps
-        <span class="state">on</span>
-      </button>
     </footer>
 
   </div>
 
 <script>
   const viewer = document.getElementById("viewer");
-  const endsToggle = document.getElementById("endsToggle");
 
-  // --- State ---
   let currentVariant = "v1";
-  let endsOn = true;
 
-  function modelPath() {
-    return `models/container-${currentVariant}${endsOn ? "" : "-plain"}.glb`;
-  }
   function syncModel() {
-    const next = modelPath();
+    const next = `models/container-${currentVariant}.glb`;
     if (viewer.src !== next) viewer.src = next;
   }
 
-  // --- Variants ---
   document.querySelectorAll(".variant-toggle button").forEach(btn => {
     btn.addEventListener("click", () => {
       currentVariant = btn.dataset.variant;
@@ -358,14 +344,6 @@
     });
   });
 
-  // --- End-cap toggle ---
-  endsToggle.addEventListener("click", () => {
-    endsOn = !endsOn;
-    endsToggle.setAttribute("aria-pressed", String(endsOn));
-    endsToggle.querySelector(".state").textContent = endsOn ? "on" : "off";
-    syncModel();
-  });
-
   // --- Camera presets ---
   // Each preset specifies the orbital angles plus a base FOV. Radius is
   // computed per-viewport so the container always lands fully framed,
@@ -374,31 +352,29 @@
   const VIEWS = {
     hero:   { theta: -32, phi: 78, fov: 30, target: "0m 1.3m 0m" },
     front:  { theta:   0, phi: 88, fov: 26, target: "0m 1.3m 0m" },
-    end:    { theta:  90, phi: 82, fov: 28, target: "0m 1.3m 0m" },
     aerial: { theta: -30, phi: 38, fov: 30, target: "0m 0.6m 0m" },
   };
 
-  // Mobile gets a touch more padding so the variant pill / chrome doesn't
-  // clip the box.
-  function paddingForViewport() {
-    return window.innerWidth < 720 ? 1.35 : 1.18;
+  function canvasSize() {
+    const r = viewer.getBoundingClientRect();
+    return { w: r.width || window.innerWidth, h: r.height || window.innerHeight };
   }
 
   function fitRadius(theta, phi, fov) {
     const θ = theta * Math.PI / 180;
     const φ = phi * Math.PI / 180;
-    // Worst-case projected width onto camera plane at this azimuth:
-    const projW = Math.abs(CONTAINER.L * Math.sin(θ)) + Math.abs(CONTAINER.W * Math.cos(θ));
-    // Vertical extent grows with downward tilt (phi away from 90°):
-    const lean   = Math.abs(Math.cos(φ));
-    const projH  = CONTAINER.H * Math.abs(Math.sin(φ)) +
-                   Math.max(CONTAINER.L, CONTAINER.W) * lean;
-    const aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+    const projW = Math.abs(CONTAINER.L * Math.cos(θ)) + Math.abs(CONTAINER.W * Math.sin(θ));
+    const lean  = Math.abs(Math.cos(φ));
+    const projH = CONTAINER.H * Math.abs(Math.sin(φ)) +
+                  Math.max(CONTAINER.L, CONTAINER.W) * lean;
+    const { w, h } = canvasSize();
+    const aspect = w / Math.max(h, 1);
     const tanV   = Math.tan(fov * Math.PI / 360);
     const tanH   = aspect * tanV;
     const dV = (projH / 2) / tanV;
     const dH = (projW / 2) / tanH;
-    return Math.max(dV, dH) * paddingForViewport();
+    const pad = w < 720 ? 1.05 : 1.12;
+    return Math.max(dV, dH) * pad;
   }
 
   let currentView = "hero";
@@ -406,9 +382,15 @@
   function applyView(name) {
     currentView = name;
     const v = VIEWS[name];
-    const r = fitRadius(v.theta, v.phi, v.fov).toFixed(2);
+    const { w, h } = canvasSize();
+    // Portrait or near-square canvases get a wider FOV so the long
+    // container fills the frame instead of sitting tiny in the middle.
+    const aspect = w / Math.max(h, 1);
+    const fovScale = aspect < 1 ? Math.min(1.7, 1 + (1 - aspect) * 0.9) : 1;
+    const fov = Math.min(70, v.fov * fovScale);
+    const r = fitRadius(v.theta, v.phi, fov).toFixed(2);
     viewer.cameraOrbit = `${v.theta}deg ${v.phi}deg ${r}m`;
-    viewer.fieldOfView = `${v.fov}deg`;
+    viewer.fieldOfView = `${fov}deg`;
     viewer.cameraTarget = v.target;
   }
 
