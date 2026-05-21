@@ -43,7 +43,7 @@
     position: fixed;
     inset: 0;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
   }
 
   /* Header */
@@ -296,7 +296,7 @@
     <div class="canvas-wrap">
       <model-viewer
         id="viewer"
-        src="models/container-v1.glb"
+        src="models/container-final.glb"
         alt="20-foot shipping container with Nigel Scott mural rendered in 3D"
         camera-controls
         touch-action="pan-y"
@@ -314,35 +314,10 @@
       <div class="caption" id="caption">Drag to rotate &middot; pinch or scroll to zoom</div>
     </div>
 
-    <footer>
-      <div class="variant-toggle" role="group" aria-label="Mural layout">
-        <button data-variant="v1" aria-pressed="true"><span class="num">1</span>Layout One</button>
-        <button data-variant="v2" aria-pressed="false"><span class="num">2</span>Layout Two</button>
-        <button data-variant="v3" aria-pressed="false"><span class="num">3</span>Layout Three</button>
-      </div>
-    </footer>
-
   </div>
 
 <script>
   const viewer = document.getElementById("viewer");
-
-  let currentVariant = "v1";
-
-  function syncModel() {
-    const next = `models/container-${currentVariant}.glb`;
-    if (viewer.src !== next) viewer.src = next;
-  }
-
-  document.querySelectorAll(".variant-toggle button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      currentVariant = btn.dataset.variant;
-      document.querySelectorAll(".variant-toggle button").forEach(b => {
-        b.setAttribute("aria-pressed", String(b === btn));
-      });
-      syncModel();
-    });
-  });
 
   // --- Camera presets ---
   // Each preset specifies the orbital angles plus a base FOV. Radius is
